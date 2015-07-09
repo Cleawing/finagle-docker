@@ -1,0 +1,8 @@
+{
+  "finch-docker": [
+    {
+      "project": "finagle-services",
+      "artifact": ["com.cleawing", "finagle-services", "0.1"]
+    }
+  ]
+}
