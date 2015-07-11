@@ -6,9 +6,11 @@ import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 
-class PingerSpec extends FeatureSpec
-  with GivenWhenThen with ShouldMatchers
-  with ScalaFutures with TryValues with Inside {
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
+  with ScalaFutures with TryValues with Inside with BeforeAndAfterAll {
 
   import org.typelevel.scalatest.DisjunctionValues._
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -17,7 +19,9 @@ class PingerSpec extends FeatureSpec
   val api = Client()
   val config = ConfigFactory.load()
 
-  feature("Pinger") {
+  override def afterAll() = Await.result(api.close(), Duration.Inf)
+
+  feature("Connection") {
     scenario("Success") {
       Given("API connection from config")
       When("ping()")
@@ -32,7 +36,10 @@ class PingerSpec extends FeatureSpec
       val missedApi = Client("127.0.0.1", 22375)
       When("ping()")
       Then("Data.ConnectionFailed")
-      whenReady(missedApi.ping()) { _.success.value.leftValue shouldBe a [Data.ConnectionFailed] }
+      whenReady(missedApi.ping()) { res =>
+        res.success.value.leftValue shouldBe a [Data.ConnectionFailed]
+        Await.result(missedApi.close(), Duration.Inf)
+      }
     }
 
     scenario("Pickup TLS-port without tls = on") {
@@ -40,7 +47,10 @@ class PingerSpec extends FeatureSpec
       val missedApi = Client(config.getInt("docker.tlsPort"))
       When("ping()")
       Then("Data.ConnectionFailed")
-      whenReady(missedApi.ping()) { _.success.value.leftValue shouldBe a [Data.ConnectionFailed] }
+      whenReady(missedApi.ping()) { res =>
+        res.success.value.leftValue shouldBe a [Data.ConnectionFailed]
+        Await.result(missedApi.close(), Duration.Inf)
+      }
     }
 
     scenario("Establish TLS-connection") {
@@ -49,7 +59,9 @@ class PingerSpec extends FeatureSpec
       When("ping()")
       Then("Data.Pong(OK)")
       whenReady(securedApi.ping())(res => inside (res.success.value.value) {
-        case Data.Pong(msg) => msg shouldBe "OK"
+        case Data.Pong(msg) =>
+          msg shouldBe "OK"
+          Await.result(securedApi.close(), Duration.Inf)
       })
     }
   }

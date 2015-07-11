@@ -1,7 +1,7 @@
 package com.cleawing.docker
 
 import com.cleawing.docker.api.{RemoteClient, Data}
-import com.cleawing.finch.TLSSupport
+import com.cleawing.finagle.http.TLSSupport
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -11,7 +11,9 @@ import scalaz.\/
 trait Client {
   implicit val ec: ExecutionContext
 
-  def ping(): Future[Client.Response]
+  def close() : Future[Unit]
+
+  def ping() : Future[Client.Response]
   def version() : Future[Client.Response]
   def info() : Future[Client.Response]
 }

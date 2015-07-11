@@ -5,13 +5,21 @@ import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 
-class ClientSpec extends FunSpec with ShouldMatchers with ScalaFutures with TryValues with EitherValues {
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+class ClientSpec extends FunSpec with ShouldMatchers
+  with ScalaFutures with TryValues with EitherValues with BeforeAndAfterAll {
   import org.typelevel.scalatest.DisjunctionValues._
 
   import scala.concurrent.ExecutionContext.Implicits.global
   implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(100, Millis))
 
   val api = Client()
+
+  override def afterAll() = {
+    Await.result(api.close(), Duration.Inf)
+  }
 
   describe("Misc") {
     it("version() should return Data.Version") {

@@ -8,6 +8,6 @@ object Dependencies {
   }
 
   lazy val scalaz  = "org.scalaz" %% "scalaz-core" % Versions.scalaz
-  lazy val scalazScalaTest  = "org.typelevel" %% "scalaz-scalatest" % Versions.scalazScalaTest
-  lazy val scalaTest  = "org.scalatest" %%  "scalatest" % Versions.scalaTest
+  lazy val scalazScalaTest  = "org.typelevel" %% "scalaz-scalatest" % Versions.scalazScalaTest % "test"
+  lazy val scalaTest  = "org.scalatest" %%  "scalatest" % Versions.scalaTest % "test"
 }
