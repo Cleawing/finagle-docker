@@ -9,6 +9,9 @@ import com.cleawing.finch.{TLSSupport, HttpClient}
 import org.json4s.jackson.JsonMethods.parse
 import com.cleawing.docker.api.Data.Implicits._
 
+import scala.util.Try
+import scalaz.{\/, \/-, -\/}
+
 private[docker] class RemoteClient(val host: String,
                    val port: Int,
                    val tlsOn: Boolean,
@@ -16,27 +19,27 @@ private[docker] class RemoteClient(val host: String,
 
   import com.cleawing.finch.HttpClient._
 
-  def ping() : Future[Either[Data.Error, Data.Pong]] = {
+  def ping() : Future[Try[Data.Error \/ Data.Pong]] = {
     simpleGet("/_ping").map {
-      case Right(success: Success) => Right(Data.Pong(success.body))
-      case Right(error: Error) => Left(Data.UnexpectedError(error.body))
-      case Left(failure : Failure) => Left(processFailure(failure))
+      case Right(success: Success) => Try(\/-(Data.Pong(success.body)))
+      case Right(error: Error) => Try(-\/(Data.UnexpectedError(error.body)))
+      case Left(failure : Failure) => Try(-\/(processFailure(failure)))
     }
   }
 
-  def version() : Future[Either[Data.Error, Data.Version]] = {
-    simpleGet("/version").map(r => processResponse[Data.Version](r))
+  def version() : Future[Try[Data.Error \/ Data.Version]] = {
+    simpleGet("/version").map(r => Try(processResponse[Data.Version](r)))
   }
 
-  def info() : Future[Either[Data.Error, Data.Info]] = {
-    simpleGet("/info").map(r => processResponse[Data.Info](r))
+  def info() : Future[Try[Data.Error \/ Data.Info]] = {
+    simpleGet("/info").map(r => Try(processResponse[Data.Info](r)))
   }
 
-  def processResponse[T: Manifest](either: Either[Failure, Response]) : Either[Data.Error, T] = {
+  def processResponse[T: Manifest](either: Either[Failure, Response]) : Data.Error \/ T = {
     either match {
-      case Right(success: Success) => Right(parse(success.body).extract[T])
-      case Right(error: Error) => Left(Data.UnexpectedError(error.body))
-      case Left(ex : Failure) => Left(processFailure(ex))
+      case Right(success: Success) => \/-(parse(success.body).extract[T])
+      case Right(error: Error) => -\/(Data.UnexpectedError(error.body))
+      case Left(ex : Failure) => -\/(processFailure(ex))
     }
   }
 

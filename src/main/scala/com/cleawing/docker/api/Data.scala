@@ -8,7 +8,10 @@ object Data {
     implicit val formats = Serialization.formats(NoTypeHints)
   }
 
-  case class Pong(msg: String)
+  sealed trait Response
+
+  case class Pong(msg: String) extends Response
+
   case class Version(
     Version: String,
     Os: String,
@@ -17,7 +20,7 @@ object Data {
     GitCommit: String,
     Arch: String,
     ApiVersion: String
-  )
+  ) extends Response
 
   case class Info
   (
@@ -54,7 +57,7 @@ object Data {
     Name: String,
     labels: Seq[String],
     ExperimentalBuild: Boolean
-  )
+  ) extends Response
 
   sealed trait Error
   // Errors

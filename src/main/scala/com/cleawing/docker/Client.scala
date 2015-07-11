@@ -5,16 +5,19 @@ import com.cleawing.finch.TLSSupport
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
+import scalaz.\/
 
 trait Client {
   implicit val ec: ExecutionContext
 
-  def ping(): Future[Either[Data.Error, Data.Pong]]
-  def version() : Future[Either[Data.Error, Data.Version]]
-  def info() : Future[Either[Data.Error, Data.Info]]
+  def ping(): Future[Client.Response]
+  def version() : Future[Client.Response]
+  def info() : Future[Client.Response]
 }
 
 object Client {
+  type Response = Try[Data.Error \/ Data.Response]
   val config = ConfigFactory.load()
 
   def apply()(implicit ec: ExecutionContext) : Client = {

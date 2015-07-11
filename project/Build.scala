@@ -10,7 +10,7 @@ object Build extends MechaRepoBuild {
     version := "0.1",
     organization := "com.cleawing",
     libraryDependencies ++= superRepoDependencies("finch-docker") ++
-      Seq(Dependencies.scalaTest)
+      Seq(Dependencies.scalaz, Dependencies.scalaTest, Dependencies.scalazScalaTest)
   )
 
   def repoName = "finch-docker"
