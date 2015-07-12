@@ -1,6 +1,6 @@
 package com.cleawing.docker.api
 
-import com.cleawing.docker.Client
+import com.cleawing.docker.DockerClient
 import com.typesafe.config.ConfigFactory
 import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
@@ -16,7 +16,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
   import scala.concurrent.ExecutionContext.Implicits.global
   implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(100, Millis))
 
-  val api = Client()
+  val api = DockerClient()
   val config = ConfigFactory.load()
 
   override def afterAll() = Await.result(api.close(), Duration.Inf)
@@ -33,7 +33,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
 
     scenario("Connection failed") {
       Given("API connection with missed host and port")
-      val missedApi = Client("127.0.0.1", 22375)
+      val missedApi = DockerClient("127.0.0.1", 22375)
       When("ping()")
       Then("Data.ConnectionFailed")
       whenReady(missedApi.ping()) { res =>
@@ -44,7 +44,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
 
     scenario("Pickup TLS-port without tls = on") {
       Given("API connection with TLS-port")
-      val missedApi = Client(config.getInt("docker.tlsPort"))
+      val missedApi = DockerClient(config.getInt("docker.tlsPort"))
       When("ping()")
       Then("Data.ConnectionFailed")
       whenReady(missedApi.ping()) { res =>
@@ -55,7 +55,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
 
     scenario("Establish TLS-connection") {
       Given("API connection with tlsOn = true")
-      val securedApi = Client(tlsOn = true)
+      val securedApi = DockerClient(tlsOn = true)
       When("ping()")
       Then("Data.Pong(OK)")
       whenReady(securedApi.ping())(res => inside (res.value) {

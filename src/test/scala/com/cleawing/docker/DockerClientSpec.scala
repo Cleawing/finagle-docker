@@ -8,14 +8,14 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class ClientSpec extends FunSpec with ShouldMatchers
+class DockerClientSpec extends FunSpec with ShouldMatchers
   with ScalaFutures with BeforeAndAfterAll {
   import org.typelevel.scalatest.DisjunctionValues._
 
   import scala.concurrent.ExecutionContext.Implicits.global
   implicit val defaultPatience = PatienceConfig(timeout = Span(2, Seconds), interval = Span(100, Millis))
 
-  val api = Client()
+  val api = DockerClient()
 
   override def afterAll() = {
     Await.result(api.close(), Duration.Inf)
