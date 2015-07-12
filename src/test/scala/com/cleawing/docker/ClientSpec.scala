@@ -9,7 +9,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class ClientSpec extends FunSpec with ShouldMatchers
-  with ScalaFutures with TryValues with EitherValues with BeforeAndAfterAll {
+  with ScalaFutures with TryValues with BeforeAndAfterAll {
   import org.typelevel.scalatest.DisjunctionValues._
 
   import scala.concurrent.ExecutionContext.Implicits.global

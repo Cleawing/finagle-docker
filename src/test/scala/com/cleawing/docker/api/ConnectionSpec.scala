@@ -54,7 +54,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
     }
 
     scenario("Establish TLS-connection") {
-      Given("API connection with tls = on")
+      Given("API connection with tlsOn = true")
       val securedApi = Client(tlsOn = true)
       When("ping()")
       Then("Data.Pong(OK)")
