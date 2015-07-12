@@ -19,9 +19,9 @@ private[docker] class RemoteClient(val host: String,
 
   def ping() : Future[Try[Data.Error \/ Data.Pong]] = {
     simpleGet("/_ping").map {
-      case Right(success: HttpClient.Success) => Try(\/-(Data.Pong(success.body)))
-      case Right(error: HttpClient.Error) => Try(-\/(Data.UnexpectedError(error.body)))
-      case Left(failure : HttpClient.Failure) => Try(-\/(processFailure(failure)))
+      case \/-(success: HttpClient.Success) => Try(\/-(Data.Pong(success.body)))
+      case \/-(error: HttpClient.Error) => Try(-\/(Data.UnexpectedError(error.body)))
+      case -\/(failure : HttpClient.Failure) => Try(-\/(processFailure(failure)))
     }
   }
 
@@ -33,11 +33,11 @@ private[docker] class RemoteClient(val host: String,
     simpleGet("/info").map(r => Try(processResponse[Data.Info](r)))
   }
 
-  def processResponse[T: Manifest](either: Either[HttpClient.Failure, HttpClient.Response]) : Data.Error \/ T = {
+  def processResponse[T: Manifest](either: \/[HttpClient.Failure, HttpClient.Response]) : Data.Error \/ T = {
     either match {
-      case Right(success: HttpClient.Success) => \/-(parse(success.body).extract[T])
-      case Right(error: HttpClient.Error) => -\/(Data.UnexpectedError(error.body))
-      case Left(ex : HttpClient.Failure) => -\/(processFailure(ex))
+      case \/-(success: HttpClient.Success) => \/-(parse(success.body).extract[T])
+      case \/-(error: HttpClient.Error) => -\/(Data.UnexpectedError(error.body))
+      case -\/(ex : HttpClient.Failure) => -\/(processFailure(ex))
     }
   }
 
