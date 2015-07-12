@@ -69,6 +69,7 @@ object Data {
   // Failures
   sealed trait Failure extends Error { val cause: Throwable }
   case class ConnectionFailed(cause: Throwable) extends Failure
+  case class UnexpectedFailure(cause: Throwable) extends Failure
 
   object Internals {
     case class RegistryConfig

@@ -9,7 +9,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class ClientSpec extends FunSpec with ShouldMatchers
-  with ScalaFutures with TryValues with BeforeAndAfterAll {
+  with ScalaFutures with BeforeAndAfterAll {
   import org.typelevel.scalatest.DisjunctionValues._
 
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -23,11 +23,11 @@ class ClientSpec extends FunSpec with ShouldMatchers
 
   describe("Misc") {
     it("version() should return Data.Version") {
-      whenReady(api.version()) { _.success.value.value shouldBe a [Data.Version]}
+      whenReady(api.version()) { _.value shouldBe a [Data.Version]}
     }
 
     it("info() should return Data.Info") {
-      whenReady(api.info()) {_.success.value.value shouldBe a [Data.Info]}
+      whenReady(api.info()) {_.value shouldBe a [Data.Info]}
     }
   }
 

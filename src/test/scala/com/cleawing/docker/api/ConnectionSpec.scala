@@ -10,7 +10,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
-  with ScalaFutures with TryValues with Inside with BeforeAndAfterAll {
+  with ScalaFutures with Inside with BeforeAndAfterAll {
 
   import org.typelevel.scalatest.DisjunctionValues._
   import scala.concurrent.ExecutionContext.Implicits.global
@@ -26,7 +26,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
       Given("API connection from config")
       When("ping()")
       Then("Data.Pong(OK)")
-      whenReady(api.ping())(res => inside (res.success.value.value) {
+      whenReady(api.ping())(res => inside (res.value) {
         case Data.Pong(msg) => msg shouldBe "OK"
       })
     }
@@ -37,7 +37,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
       When("ping()")
       Then("Data.ConnectionFailed")
       whenReady(missedApi.ping()) { res =>
-        res.success.value.leftValue shouldBe a [Data.ConnectionFailed]
+        res.leftValue shouldBe a [Data.ConnectionFailed]
         Await.result(missedApi.close(), Duration.Inf)
       }
     }
@@ -48,7 +48,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
       When("ping()")
       Then("Data.ConnectionFailed")
       whenReady(missedApi.ping()) { res =>
-        res.success.value.leftValue shouldBe a [Data.ConnectionFailed]
+        res.leftValue shouldBe a [Data.ConnectionFailed]
         Await.result(missedApi.close(), Duration.Inf)
       }
     }
@@ -58,7 +58,7 @@ class ConnectionSpec extends FeatureSpec with GivenWhenThen with ShouldMatchers
       val securedApi = Client(tlsOn = true)
       When("ping()")
       Then("Data.Pong(OK)")
-      whenReady(securedApi.ping())(res => inside (res.success.value.value) {
+      whenReady(securedApi.ping())(res => inside (res.value) {
         case Data.Pong(msg) =>
           msg shouldBe "OK"
           Await.result(securedApi.close(), Duration.Inf)

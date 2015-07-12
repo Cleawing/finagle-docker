@@ -19,7 +19,7 @@ trait Client {
 }
 
 object Client {
-  type Response = Try[Data.Error \/ Data.Response]
+  type Response = Data.Error \/ Data.Response
   val config = ConfigFactory.load()
 
   def apply()(implicit ec: ExecutionContext) : Client = {
